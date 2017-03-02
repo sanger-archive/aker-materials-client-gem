@@ -1,0 +1,21 @@
+Material:
+
+  ✔ New with dynamic attributes @done (17-03-02 11:32)
+
+  ✔ Can get and set attributes @done (17-03-02 11:37)
+
+  ✔ Can set nested attributes @done (17-03-02 11:39)
+
+  ✔ Serialize attributes to json @done (17-03-02 11:57)
+
+Query Builder:
+
+  ☐ Filtering
+
+  ☐ Sorting
+
+  ☐ Pagination
+
+  ☐ Projections
+
+  ☐ Embedding
