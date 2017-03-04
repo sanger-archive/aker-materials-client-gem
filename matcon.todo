@@ -8,14 +8,48 @@ Material:
 
   ✔ Serialize attributes to json @done (17-03-02 11:57)
 
-Query Builder:
+Containers:
 
-  ☐ Filtering
+  ☐ New with dynamic attributes
 
-  ☐ Sorting
+  ☐ Can get and set attributes
 
-  ☐ Pagination
+  ☐ Can set nested attributes
+
+  ☐ Serialize attributes to json
+
+Requests:
+
+  ✔ Read @started(17-03-03 15:02) @done (17-03-03 15:20) @lasted(0:18)
+
+  ☐ Create
+
+  ☐ Update
+
+  ☐ Delete
+
+Errors:
+
+  ☐ Request errors
+
+    ☐ 400..499
+
+    ☐ 500..599
+
+Query (Builder):
+
+  Need to build a class called Query. It will have the attributes where, order, limit, page, projection, embed.
+
+  Will have a to_s method that will turn all the attributes that have been set into a string
+
+  ✔ Page @started(17-03-04 13:09) @done (17-03-04 13:25) @lasted(0:16)
+
+  ✔ Limit @started(17-03-04 13:25) @done (17-03-04 13:35) @lasted(0:10)
+
+  ✔ Sorting @done (17-03-04 13:58)
 
   ☐ Projections
 
   ☐ Embedding
+
+  ✔ Filtering @done (17-03-04 14:31)
