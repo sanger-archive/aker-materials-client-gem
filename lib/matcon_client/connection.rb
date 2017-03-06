@@ -4,15 +4,11 @@ module MatconClient
     attr_reader :faraday
 
     def initialize(options = {})
-      p options
       site = options.fetch(:site)
       connection_options = options.slice(:proxy, :ssl, :request, :headers, :params)
       adapter_options = Array(options.fetch(:adapter, Faraday.default_adapter))
 
       @faraday = Faraday.new(site, connection_options) do |builder|
-        # builder.use Middleware::JsonRequest
-        # builder.use Middleware::Status
-        # builder.use Middleware::ParseJson
         builder.adapter(*adapter_options)
       end
 
@@ -20,10 +16,10 @@ module MatconClient
     end
 
     # insert middleware before ParseJson - middleware executed in reverse order -
-    #   inserted middleware will run after json parsed
+    # inserted middleware will run after json parsed
     def use(middleware, *args, &block)
       return if faraday.builder.locked?
-      faraday.builder.insert_before(Middleware::ParseJson, middleware, *args, &block)
+      # faraday.builder.insert_before(Middleware::ParseJson, middleware, *args, &block)
     end
 
     def delete(middleware)
