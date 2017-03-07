@@ -117,7 +117,15 @@ describe MatconClient::ResponseHandlerFactory do
       it 'builds a ResultSet' do
         result_set = response_handler.build(response_with_items)
         expect(result_set).to be_instance_of MatconClient::ResultSet
+        expect(result_set.model).to be model
       end
+
+      it 'contains model instances' do
+        result_set_items = response_handler.build(response_with_items).entries
+        expect(result_set_items.length).to be 2
+        expect(result_set_items.all?{ |m| m == model_instance}).to be true
+      end
+
     end
 
   end

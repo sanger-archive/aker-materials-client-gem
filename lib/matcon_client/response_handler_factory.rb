@@ -9,7 +9,7 @@ module MatconClient
 
     def build(response)
       if (response.has_key?(:_items))
-        MatconClient::ResultSet.new(response: response)
+        MatconClient::ResultSet.new(response: response, model: model)
       else
         model.new(response)
       end
