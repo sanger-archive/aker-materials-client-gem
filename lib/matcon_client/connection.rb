@@ -1,3 +1,5 @@
+require 'faraday_middleware'
+
 module MatconClient
   class Connection
 
@@ -10,16 +12,19 @@ module MatconClient
 
       @faraday = Faraday.new(site, connection_options) do |builder|
         builder.adapter(*adapter_options)
+
+        # Faraday Middleware
+        # https://github.com/lostisland/faraday_middleware
+        builder.use ::FaradayMiddleware::ParseJson, :content_type => /\bjson$/
       end
 
       yield(self) if block_given?
     end
 
-    # insert middleware before ParseJson - middleware executed in reverse order -
     # inserted middleware will run after json parsed
     def use(middleware, *args, &block)
       return if faraday.builder.locked?
-      # faraday.builder.insert_before(Middleware::ParseJson, middleware, *args, &block)
+      faraday.builder.insert_before(::FaradayMiddleware::ParseJson, middleware, *args, &block)
     end
 
     def delete(middleware)
