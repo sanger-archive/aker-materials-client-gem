@@ -12,4 +12,5 @@ module MatconClient
   autoload :Middleware,              'matcon_client/middleware'
   autoload :ResponseHandlerFactory,  'matcon_client/response_handler_factory'
   autoload :ResultSet,               'matcon_client/result_set'
+  autoload :Slot,					 'matcon_client/models/slot'
 end

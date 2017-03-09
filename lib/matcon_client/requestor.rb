@@ -7,28 +7,30 @@ module MatconClient
       @klass = options.fetch(:klass)
     end
 
-    def get(path, params = {}, headers = {})
+    def get(path=nil, params = {}, headers = {})
+      fullpath = klass.endpoint
+      fullpath += '/'+path unless path.nil?
       query = params.delete(:query)
-      path = "#{path}?#{query}" if query.present?
-      request(:get, path, {}, headers)
+      fullpath = "#{fullpath}?#{query}" if query.present?
+      request(:get, fullpath, {}, headers)
     end
 
-    def post(path, params = {}, headers = {})
-      request(:post, path, params, headers)
+    def post(path=nil, params = {}, headers = {})
+      fullpath = klass.endpoint
+      fullpath += '/'+path unless path.nil?
+      request(:post, fullpath, params, headers)
     end
 
     def put(path, params = {}, headers = {})
-      request(:put, path, params, headers)
-    end
-
-    def delete(path, params = {}, headers = {})
-      request(:delete, path, params, headers)
+      fullpath = klass.endpoint
+      fullpath += '/'+path unless path.nil?
+      request(:put, fullpath, params, headers)
     end
 
   private
 
     def request(action, path, params, headers)
-      klass.result_set.build(klass.connection.run(action, path, params, headers))
+      klass.response_handler.build(klass.connection.run(action, path, params, headers))
     end
 
   end

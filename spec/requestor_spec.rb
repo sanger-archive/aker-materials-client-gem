@@ -3,11 +3,11 @@ require "spec_helper"
 describe MatconClient::Requestor do
 
   let(:connection) { double("Connection") }
-  let(:result_set) { double("Result Set") }
+  let(:response_handler) { double("Response handler") }
   let(:some_json)  { { some: 'json'}.to_json }
 
   let(:klass) do
-    double("Material", connection: connection, result_set: result_set, endpoint: 'materials')
+    double("Material", connection: connection, response_handler: response_handler, endpoint: 'materials')
   end
 
   let(:requestor) { MatconClient::Requestor.new(klass: klass) }
@@ -24,15 +24,15 @@ describe MatconClient::Requestor do
 
     it 'calls connection#run with get' do
       expect(connection).to receive(:run).with(:get, 'materials', {}, {}).and_return(some_json)
-      expect(result_set).to receive(:build).with(some_json)
-      requestor.get('materials')
+      expect(response_handler).to receive(:build).with(some_json)
+      requestor.get()
     end
 
     context 'when called with query params' do
       it 'calls connection#run with the query params in the path' do
         expect(connection).to receive(:run).with(:get, 'materials?test=foo', {}, {}).and_return(some_json)
-        expect(result_set).to receive(:build).with(some_json)
-        requestor.get('materials', query: 'test=foo')
+        expect(response_handler).to receive(:build).with(some_json)
+        requestor.get(nil, query: 'test=foo')
       end
     end
 
@@ -44,8 +44,8 @@ describe MatconClient::Requestor do
       expect(connection).to receive(:run).with(:post, 'materials', { body: { monkey: 'news' } }, {})
                                          .and_return(some_json)
 
-      expect(result_set).to receive(:build).with(some_json)
-      requestor.post('materials', body: { monkey: 'news' })
+      expect(response_handler).to receive(:build).with(some_json)
+      requestor.post(nil, body: { monkey: 'news' })
     end
   end
 
@@ -55,21 +55,9 @@ describe MatconClient::Requestor do
       expect(connection).to receive(:run).with(:put, 'materials', { body: { monkey: 'news' } }, {})
                                          .and_return(some_json)
 
-      expect(result_set).to receive(:build).with(some_json)
-      requestor.put('materials', body: { monkey: 'news' })
+      expect(response_handler).to receive(:build).with(some_json)
+      requestor.put(nil, body: { monkey: 'news' })
     end
-  end
-
-  describe '#delete' do
-
-    it 'calls connection#run with delete' do
-      expect(connection).to receive(:run).with(:delete, 'materials/1234-1234-1234-1234', {}, {})
-                                         .and_return(some_json)
-
-      expect(result_set).to receive(:build).with(some_json)
-      requestor.delete('materials/1234-1234-1234-1234')
-    end
-
   end
 
 end

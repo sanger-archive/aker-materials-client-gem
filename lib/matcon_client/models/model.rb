@@ -7,12 +7,16 @@ module MatconClient
                       :connection_class,
                       :connection_object,
                       :connection_options,
-                      :endpoint
+                      :endpoint,
+                      :response_handler,
+                      :requestor
 
       self.connection_class     = Connection
       self.connection_options   = { :headers => { "Content-Type" => "application/json", "Accept" => "application/json" } }
 
       attr_reader :attributes
+
+      alias_attribute :id, :_id
 
       def initialize(attributes = {})
         update_attributes(attributes)
@@ -28,6 +32,10 @@ module MatconClient
 
       class << self
 
+        def find(id)
+          requestor.get(id)
+        end
+
         def from_json(json)
           attributes = JSON.parse(json)
           new(attributes)
@@ -35,16 +43,36 @@ module MatconClient
 
         def connection(rebuild = false, &block)
           _build_connection(rebuild, &block)
-          connection_object
+          @connection_object
+        end
+
+        def response_handler(rebuild = false)
+          _build_response_handler(rebuild)
+          @response_handler
+        end
+
+        def requestor(rebuild = false)
+          _build_requester(rebuild)
+          @requestor
         end
 
         protected
 
         def _build_connection(rebuild = false)
-          return connection_object unless connection_object.nil? || rebuild
-          self.connection_object = connection_class.new(connection_options.merge(site: site)).tap do |conn|
+          return @connection_object unless @connection_object.nil? || rebuild
+          @connection_object = connection_class.new(connection_options.merge(site: site)).tap do |conn|
             yield(conn) if block_given?
           end
+        end
+
+        def _build_response_handler(rebuild = false)
+          return @response_handler unless @response_handler.nil? || rebuild
+          @response_handler = MatconClient::ResponseHandlerFactory.new(model: self)
+        end
+
+        def _build_requester(rebuild = false)
+          return @requestor unless @requestor.nil? || rebuild
+          @requestor = MatconClient::Requestor.new(klass: self)
         end
 
       end
