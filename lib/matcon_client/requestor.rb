@@ -8,26 +8,30 @@ module MatconClient
     end
 
     def get(path=nil, params = {}, headers = {})
-      fullpath = klass.endpoint
-      fullpath += '/'+path unless path.nil?
       query = params.delete(:query)
-      fullpath = "#{fullpath}?#{query}" if query.present?
-      request(:get, fullpath, {}, headers)
+      request(:get, fullpath(path, query), {}, headers)
     end
 
     def post(path=nil, params = {}, headers = {})
-      fullpath = klass.endpoint
-      fullpath += '/'+path unless path.nil?
-      request(:post, fullpath, params, headers)
+      request(:post, fullpath(path), params, headers)
     end
 
     def put(path, params = {}, headers = {})
-      fullpath = klass.endpoint
-      fullpath += '/'+path unless path.nil?
-      request(:put, fullpath, params, headers)
+      request(:put, fullpath(path), params, headers)
+    end
+
+    def delete(path, params = {}, header = {})
+      request(:delete, fullpath(path), params, header)
     end
 
   private
+
+    def fullpath(path, query=nil)
+      f = klass.endpoint
+      f += '/'+path unless path.nil?
+      f = "#{f}?#{query}" unless query.nil?
+      f
+    end
 
     def request(action, path, params, headers)
       klass.response_handler.build(klass.connection.run(action, path, params, headers))
