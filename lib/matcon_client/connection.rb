@@ -13,6 +13,8 @@ module MatconClient
       @faraday = Faraday.new(site, connection_options) do |builder|
         builder.adapter(*adapter_options)
 
+        builder.use MatconClient::Middleware::Status
+
         # Faraday Middleware
         # https://github.com/lostisland/faraday_middleware
         builder.use ::FaradayMiddleware::ParseJson, :content_type => /\bjson$/
