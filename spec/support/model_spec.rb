@@ -46,7 +46,7 @@ RSpec.shared_examples "a model" do
 
   describe '#find' do
     it 'can find a model with a given id' do
-      expect(described_class.connection).to receive(:run).with(:get, described_class.endpoint+'/123', {}, {}).and_return({_id: '123'})
+      expect(described_class.connection).to receive(:run).with(:get, described_class.endpoint+'/123', {}, {}).and_return(instance_double('Faraday::Response', body: { _id: '123' }))
       m = described_class.find('123')
       expect(m).to be_instance_of(described_class)
       expect(m.id).to eq '123'

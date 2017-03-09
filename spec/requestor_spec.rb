@@ -4,7 +4,7 @@ describe MatconClient::Requestor do
 
   let(:connection) { double("Connection") }
   let(:response_handler) { double("Response handler") }
-  let(:some_json)  { { some: 'json'}.to_json }
+  let(:some_json) { instance_double("Faraday::Response", body: { some: 'json'}) }
 
   let(:klass) do
     double("Material", connection: connection, response_handler: response_handler, endpoint: 'materials')
@@ -57,6 +57,15 @@ describe MatconClient::Requestor do
 
       expect(response_handler).to receive(:build).with(some_json)
       requestor.put(nil, body: { monkey: 'news' })
+    end
+  end
+
+  describe '#delete' do
+    it 'calls connection#run with delete' do
+      expect(connection).to receive(:run).with(:delete, 'materials/123', {}, {})
+                  .and_return(some_json)
+      expect(response_handler).to receive(:build).with(some_json)
+      requestor.delete('123')
     end
   end
 

@@ -7,7 +7,7 @@ describe MatconClient::ResponseHandlerFactory do
   let(:response_handler) { MatconClient::ResponseHandlerFactory.new(model: model) }
 
   let(:response) do
-    {
+    instance_double("Faraday::Response", body: {
         "_updated": "Mon, 23 Jan 2017 09:53:00 GMT",
         "gender": "male",
         "_links": {
@@ -30,11 +30,11 @@ describe MatconClient::ResponseHandlerFactory do
         "common_name": "asdf",
         "_created": "Mon, 23 Jan 2017 09:53:00 GMT",
         "_id": "a341279d-7dde-472a-9b74-bb2612ee9977"
-    }
+    })
   end
 
   let(:response_with_items) do
-    {
+    instance_double("Faraday::Response", body: {
         "_items": [
             {
                 "_updated": "Mon, 23 Jan 2017 09:53:00 GMT",
@@ -92,7 +92,7 @@ describe MatconClient::ResponseHandlerFactory do
             "total": 2,
             "page": 1
         }
-      }
+      })
   end
 
   describe '#initialize' do
@@ -108,7 +108,7 @@ describe MatconClient::ResponseHandlerFactory do
     context 'when build is passed a response with no _items' do
 
       it 'calls new on its model' do
-        expect(model).to receive(:new).with(response)
+        expect(model).to receive(:new).with(response.body)
         expect(response_handler.build(response)).to be model_instance
       end
     end

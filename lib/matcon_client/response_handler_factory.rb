@@ -8,10 +8,12 @@ module MatconClient
     end
 
     def build(response)
-      if (response.has_key?(:_items))
-        MatconClient::ResultSet.new(response: response, model: model)
+      body = HashWithIndifferentAccess.new(response.body)
+
+      if (body.has_key?(:_items))
+        MatconClient::ResultSet.new(response: body, model: model)
       else
-        model.new(response)
+        model.new(body)
       end
     end
 
