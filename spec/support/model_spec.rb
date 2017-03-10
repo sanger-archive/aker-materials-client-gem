@@ -85,25 +85,12 @@ RSpec.shared_examples "a model" do
 
   end
 
-  describe 'deserialization' do
+  describe '#serialize' do
 
-    it 'can be have its attributes set from json' do
-      json = { name: 'pikachu', colour: 'yellow'}.to_json
-
-      material = described_class.from_json(json)
-
-      expect(material.name).to eql('pikachu')
-      expect(material.colour).to eql('yellow')
-    end
-
-  end
-
-  describe 'serialization' do
-
-    it 'can serialize its attributes to json' do
-      json = { name: 'pikachu', colour: 'yellow'}.to_json
-      material = described_class.new(name: 'pikachu', colour: 'yellow')
-      expect(material.to_json).to eql(json)
+    it 'can serialize its attributes to a hash' do
+      expected = { name: 'pikachu', colour: 'yellow' }
+      material = described_class.new(name: 'pikachu', colour: 'yellow', _created: "asdfasdf", _updated: "sadfsadf")
+      expect(material.serialize).to eql(expected.stringify_keys)
     end
   end
 
