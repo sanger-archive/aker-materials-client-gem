@@ -3,7 +3,9 @@ require "spec_helper"
 describe MatconClient::Query do
 
   before :each do
-    @query = MatconClient::Query.new
+    @requestor = double("Requestor")
+    @model = double("Model", requestor: @requestor)
+    @query = MatconClient::Query.new(klass: @model)
   end
 
   describe '#to_s' do
@@ -185,5 +187,18 @@ describe MatconClient::Query do
     end
   end
 
+  describe '#each' do
+    it 'should respond to the #each method call' do
+      expect(@query).to respond_to(:each)
+    end
+  end
+
+  describe '#result_set' do
+    it 'should create a result set by calling the klass requestor with its query string' do
+      expect(@requestor).to receive(:get).with(nil, { query: "page=2&max_results=30" })
+
+      @query.page(2).limit(30).result_set
+    end
+  end
 
 end

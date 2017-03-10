@@ -3,13 +3,15 @@ require 'json'
 module MatconClient
   module Models
     class Model
+
       class_attribute :site,
                       :connection_class,
                       :connection_object,
                       :connection_options,
                       :endpoint,
                       :response_handler,
-                      :requestor
+                      :requestor,
+                      :query_object
 
       self.connection_class     = Connection
       self.connection_options   = { :headers => { "Content-Type" => "application/json", "Accept" => "application/json" } }
@@ -31,6 +33,9 @@ module MatconClient
       end
 
       class << self
+
+        extend Forwardable
+        def_delegators :query_object, :page, :limit, :order, :where, :projection, :embed
 
         def find(id)
           requestor.get(id)
@@ -54,6 +59,10 @@ module MatconClient
         def requestor(rebuild = false)
           _build_requester(rebuild)
           @requestor
+        end
+
+        def query_object
+          @query_object ||= MatconClient::Query.new(klass: self)
         end
 
         protected

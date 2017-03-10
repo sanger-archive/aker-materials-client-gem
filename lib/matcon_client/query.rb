@@ -19,10 +19,24 @@
 module MatconClient
   class Query
 
-    attr_reader :params
+    include Enumerable
 
-    def initialize
+    attr_reader :params, :klass
+
+    def initialize(options)
+      @klass  = options.fetch(:klass)
       @params = initial_params
+    end
+
+    def each(&block)
+      result_set.each do |result|
+        block.call(result)
+      end
+    end
+
+    # Executes the built query. Will return a ModelClient::ResultSet
+    def result_set
+      klass.requestor.get(nil, { query: to_s })
     end
 
     # Resets all params to nil
