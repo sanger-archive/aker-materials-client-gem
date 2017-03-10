@@ -44,6 +44,19 @@ RSpec.shared_examples "a model" do
     end
   end
 
+  describe 'querying' do
+
+    it 'should forward the methods of query onto it' do
+      expect(described_class).to respond_to(:page)
+      expect(described_class).to respond_to(:limit)
+      expect(described_class).to respond_to(:order)
+      expect(described_class).to respond_to(:where)
+      expect(described_class).to respond_to(:projection)
+      expect(described_class).to respond_to(:embed)
+    end
+
+  end
+
   describe '#find' do
     it 'can find a model with a given id' do
       expect(described_class.connection).to receive(:run).with(:get, described_class.endpoint+'/123', {}, {}).and_return(instance_double('Faraday::Response', body: { _id: '123' }))
