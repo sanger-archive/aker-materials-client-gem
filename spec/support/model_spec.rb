@@ -150,7 +150,7 @@ RSpec.shared_examples "a model" do
       it 'sends a PUT and updates the current model' do
         body = { _id: '123', gender: 'female' }
         expect(described_class.connection).to receive(:run)
-                                                .with(:put, described_class.endpoint + '/' + body[:_id], body, {})
+                                                .with(:put, described_class.endpoint + '/' + body[:_id], body.to_json, {})
                                                 .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
         model = described_class.new(_id: '123', gender: 'male')
@@ -163,7 +163,7 @@ RSpec.shared_examples "a model" do
       it 'sends a POST and updates the current model' do
         body = { gender: 'female' }
         expect(described_class.connection).to receive(:run)
-                                                .with(:post, described_class.endpoint, body, {})
+                                                .with(:post, described_class.endpoint, body.to_json, {})
                                                 .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
         model = described_class.new(gender: 'female')
