@@ -1,6 +1,7 @@
 module MatconClient
     class Slot
-    	attr_reader :address, :material_id, :material
+    	attr_reader :address, :material_id
+        attr_accessor :material
 
     	def initialize(attrs)
     		@address = attrs.fetch(:address)
@@ -9,7 +10,7 @@ module MatconClient
     			@material_id = mat
     			@material = nil
     		elsif mat.is_a? Hash
-    			@material = MatconClient::Models::Material.new(mat)
+    			@material = MatconClient::Material.new(mat)
     			@material_id = @material.id
     		end
     	end
@@ -18,5 +19,9 @@ module MatconClient
     		@material_id.nil?
     	end
 
+        def material=(material)
+            @material=material
+            @material_id=material.id
+        end
     end
 end

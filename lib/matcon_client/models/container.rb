@@ -1,20 +1,34 @@
 module MatconClient
-  module Models
-    class Container < Model
-      self.endpoint = 'containers'
+  class Container < Model
+    self.endpoint = 'containers'
 
-      def slots
-      	@slots ||= make_slots(super)
+    def slots
+    	@slots ||= make_slots(super)
+    end
+
+    def material_ids
+    	slots.lazy.reject(&:empty?).map(&:material_id).force
+    end
+
+    def materials
+      slots_to_fetch = slots.select do |slot|
+        !slot.empty? && slot.material.nil?
       end
 
-      def material_ids
-      	slots.lazy.reject(&:empty?).map(&:material_id).force
+      if (!slots_to_fetch.empty?)
+        rs = MatconClient::Material.where(_id: { "$in": slots_to_fetch.map(&:material_id) }).result_set
+
+        slots_to_fetch.each do |s|
+          s.material = rs.find { |material| s.material_id == material.id }
+        end
       end
 
-    private
-      def make_slots(superslots)
-      	superslots.map { |s| MatconClient::Slot.new(s) }
-      end
+      slots.select { |slot| !slot.empty? }.map(&:material)
+    end
+
+  private
+    def make_slots(superslots)
+    	superslots.map { |s| MatconClient::Slot.new(s) }
     end
   end
 end
