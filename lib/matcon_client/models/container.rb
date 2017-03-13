@@ -2,6 +2,8 @@ module MatconClient
   class Container < Model
     self.endpoint = 'containers'
 
+    alias_attribute :uuid, :id
+
     def serialize
       container_hash = super
       container_hash.merge!(slots: serialize_slots) if has_attribute?(:slots)
