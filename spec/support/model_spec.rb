@@ -119,7 +119,7 @@ RSpec.shared_examples "a model" do
   describe '#create' do
     it 'can create a model (including saving it on the server)' do
       body = { gender: 'female' }
-      expect(described_class.connection).to receive(:run).with(:post, described_class.endpoint, body, {}).and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
+      expect(described_class.connection).to receive(:run).with(:post, described_class.endpoint, body.to_json, {}).and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
       m = described_class.create(body)
       expect(m).to be_instance_of(described_class)

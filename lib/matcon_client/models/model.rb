@@ -63,7 +63,7 @@ module MatconClient
       end
 
       def create(attrs)
-        requestor.post(nil, attrs)
+        requestor.post(nil, attrs.to_json)
       end
 
       def destroy(id)
