@@ -85,25 +85,12 @@ RSpec.shared_examples "a model" do
 
   end
 
-  describe 'deserialization' do
+  describe '#serialize' do
 
-    it 'can be have its attributes set from json' do
-      json = { name: 'pikachu', colour: 'yellow'}.to_json
-
-      material = described_class.from_json(json)
-
-      expect(material.name).to eql('pikachu')
-      expect(material.colour).to eql('yellow')
-    end
-
-  end
-
-  describe 'serialization' do
-
-    it 'can serialize its attributes to json' do
-      json = { name: 'pikachu', colour: 'yellow'}.to_json
-      material = described_class.new(name: 'pikachu', colour: 'yellow')
-      expect(material.to_json).to eql(json)
+    it 'can serialize its attributes to a hash' do
+      expected = { name: 'pikachu', colour: 'yellow' }
+      material = described_class.new(name: 'pikachu', colour: 'yellow', _created: "asdfasdf", _updated: "sadfsadf")
+      expect(material.serialize).to eql(expected.stringify_keys)
     end
   end
 
@@ -163,7 +150,7 @@ RSpec.shared_examples "a model" do
       it 'sends a PUT and updates the current model' do
         body = { _id: '123', gender: 'female' }
         expect(described_class.connection).to receive(:run)
-                                                .with(:put, described_class.endpoint + '/' + body[:_id], body, {})
+                                                .with(:put, described_class.endpoint + '/' + body[:_id], body.to_json, {})
                                                 .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
         model = described_class.new(_id: '123', gender: 'male')
@@ -176,7 +163,7 @@ RSpec.shared_examples "a model" do
       it 'sends a POST and updates the current model' do
         body = { gender: 'female' }
         expect(described_class.connection).to receive(:run)
-                                                .with(:post, described_class.endpoint, body, {})
+                                                .with(:post, described_class.endpoint, body.to_json, {})
                                                 .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
         model = described_class.new(gender: 'female')

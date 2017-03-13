@@ -64,4 +64,46 @@ describe MatconClient::Container do
 
   end
 
+  describe '#serialize' do
+
+    let(:container_args) do
+      {
+        "num_of_cols": 12,
+        "barcode": "AKER-2",
+        "num_of_rows": 8,
+        "col_is_alpha": false,
+        "print_count": 0,
+        "row_is_alpha": true,
+        "slots": [
+          {
+              "material": "d73ef189-2c2f-4892-b7fa-ea916dde23d7",
+              "address": "A:1"
+          },
+          {
+              "address": "A:2"
+          }
+        ]
+      }
+    end
+
+    before :each do
+      @container = MatconClient::Container.new(container_args)
+    end
+
+    it 'converts the Container into a Hash' do
+      expect(@container.serialize).to eq(container_args.stringify_keys)
+    end
+
+    context "when updating the slots of a Container" do
+      it "serializes slots" do
+        @container.slots.second.material = MatconClient::Material.new(_id: "123")
+
+        expected = container_args.deep_dup
+        expected[:slots][1][:material] = "123"
+
+        expect(@container.serialize).to eq(expected.stringify_keys)
+      end
+    end
+  end
+
 end

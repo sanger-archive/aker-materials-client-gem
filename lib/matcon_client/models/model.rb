@@ -27,8 +27,8 @@ module MatconClient
       @attributes ||= ActiveSupport::HashWithIndifferentAccess.new
     end
 
-    def to_json
-      attributes.reject {|attr| attr[0] == '_' && attr != '_id' }.to_json
+    def serialize
+      attributes.reject {|attr| attr[0] == '_' && attr != '_id' }
     end
 
     def persisted?
@@ -37,9 +37,9 @@ module MatconClient
 
     def save
       if has_attribute?(:_id)
-        requestor.put(@attributes[:_id], @attributes)
+        requestor.put(@attributes[:_id], serialize.to_json)
       else
-        model = requestor.post(nil, @attributes)
+        model = requestor.post(nil, serialize.to_json)
         update_attributes(model.attributes)
       end
     end
@@ -123,7 +123,6 @@ module MatconClient
 
     def update_attributes(attrs)
       return @attributes unless attrs.present?
-
       attrs.each do |key, value|
         send("#{key}=", value)
       end

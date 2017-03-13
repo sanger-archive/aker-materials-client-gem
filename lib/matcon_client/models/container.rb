@@ -2,6 +2,12 @@ module MatconClient
   class Container < Model
     self.endpoint = 'containers'
 
+    def serialize
+      container_hash = super
+      container_hash.merge!(slots: serialize_slots) if has_attribute?(:slots)
+      container_hash
+    end
+
     def slots
     	@slots ||= make_slots(super)
     end
@@ -27,8 +33,13 @@ module MatconClient
     end
 
   private
+
     def make_slots(superslots)
     	superslots.map { |s| MatconClient::Slot.new(s) }
+    end
+
+    def serialize_slots
+      slots.map(&:serialize)
     end
   end
 end
