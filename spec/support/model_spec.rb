@@ -88,8 +88,8 @@ RSpec.shared_examples "a model" do
   describe '#serialize' do
 
     it 'can serialize its attributes to a hash' do
-      expected = { name: 'pikachu', colour: 'yellow' }
-      material = described_class.new(name: 'pikachu', colour: 'yellow', _created: "asdfasdf", _updated: "sadfsadf")
+      expected = described_class.default_attributes.merge({ gender: 'male', donor_id: '1234', common_name: nil })
+      material = described_class.new(gender: 'male', donor_id: '1234', common_name: nil, _created: "asdfasdf", _updated: "sadfsadf")
       expect(material.serialize).to eql(expected.stringify_keys)
     end
   end
@@ -148,28 +148,44 @@ RSpec.shared_examples "a model" do
   describe '#save' do
     context 'when model is already persisted' do
       it 'sends a PUT and updates the current model' do
-        body = { _id: '123', gender: 'female' }
-        expect(described_class.connection).to receive(:run)
-                                                .with(:put, described_class.endpoint + '/' + body[:_id], body.to_json, {})
-                                                .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
+        captured = {}
+        body = described_class.default_attributes.merge({ _id: '123', gender: 'female', donor_id: nil, common_name: nil })
+        expect(described_class.connection).to receive(:run) do |method, url, body_json, other|
+                              captured[:method] = method
+                              captured[:url] = url
+                              captured[:body] = body_json
+                        end
+                        .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female', donor_id: nil, common_name: nil }))
 
-        model = described_class.new(_id: '123', gender: 'male')
+
+        model = described_class.new(_id: '123', gender: 'male', donor_id: nil, common_name: nil)
         model.gender = 'female'
         model.save
+
+        expect(captured[:method]).to eq :put
+        expect(captured[:url]).to eq described_class.endpoint+'/'+body[:_id]
+        expect(JSON.parse(captured[:body])).to eq body.stringify_keys
       end
     end
 
     context 'when model is not persisted' do
       it 'sends a POST and updates the current model' do
-        body = { gender: 'female' }
-        expect(described_class.connection).to receive(:run)
-                                                .with(:post, described_class.endpoint, body.to_json, {})
-                                                .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
+        body = described_class.default_attributes.merge({ gender: 'female' })
+        captured = {}
+        expect(described_class.connection).to receive(:run) do |method, url, body_json, other|
+                              captured[:method] = method
+                              captured[:url] = url
+                              captured[:body] = body_json
+                        end
+                        .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female' }))
 
         model = described_class.new(gender: 'female')
         model.save
         expect(model.id).to eq('123')
         expect(model.persisted?).to be(true)
+        expect(captured[:method]).to eq :post
+        expect(captured[:url]).to eq described_class.endpoint
+        expect(JSON.parse(captured[:body])).to eq body.stringify_keys
       end
     end
   end
@@ -230,4 +246,35 @@ RSpec.shared_examples "a model" do
       end
     end
   end
+
+  describe '#update_attributes' do
+    it 'to update model with the new attributes' do
+      captured = {}
+      body = described_class.default_attributes.merge({ _id: '123', gender: 'female', common_name: 'Mouse'})
+      expect(described_class.connection).to receive(:run) do |method, url, body_json, other|
+                              captured[:method] = method
+                              captured[:url] = url
+                              captured[:body] = body_json
+                        end
+                      .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female', common_name: 'Mouse' }))
+      model = described_class.new(_id: '123', gender: 'male')
+      model.update_attributes(gender: 'female', common_name: 'Mouse')
+      expect(model.gender).to eq 'female'
+      expect(model.common_name).to eq 'Mouse'
+      expect(captured[:method]).to eq :put
+      expect(captured[:url]).to eq described_class.endpoint+'/'+body[:_id]
+      expect(JSON.parse(captured[:body])).to eq body.stringify_keys
+    end
+  end
+
+  describe 'initialization' do
+
+    it "builts the default attributes from the schema" do
+        thing = described_class.new
+        described_class.default_attributes.each do | k,v |
+          expect(thing.send(k)).to be nil
+        end
+    end
+  end
+
 end

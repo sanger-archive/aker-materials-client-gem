@@ -10,7 +10,8 @@ module MatconClient
                     :endpoint,
                     :response_handler,
                     :requestor,
-                    :query_object
+                    :query_object,
+                    :schema
 
     self.connection_class     = Connection
     self.connection_options   = { :headers => { "Content-Type" => "application/json", "Accept" => "application/json" } }
@@ -20,7 +21,7 @@ module MatconClient
     alias_attribute :id, :_id
 
     def initialize(attributes = {})
-      update_attributes(attributes)
+      set_attributes(self.class.default_attributes.merge(attributes))
     end
 
     def attributes
@@ -40,7 +41,7 @@ module MatconClient
         requestor.put(@attributes[:_id], serialize.to_json)
       else
         model = requestor.post(nil, serialize.to_json)
-        update_attributes(model.attributes)
+        set_attributes(model.attributes)
       end
     end
 
@@ -50,7 +51,12 @@ module MatconClient
     end
 
     def ==(other)
-        return self.id == other.id && self.class.to_s == other.class.to_s
+      return self.id == other.id && self.class.to_s == other.class.to_s
+    end
+
+    def update_attributes(attrs)
+      set_attributes(attrs)
+      save
     end
 
     class << self
@@ -98,7 +104,21 @@ module MatconClient
         @query_object ||= MatconClient::Query.new(klass: self)
       end
 
+      def schema
+        _fetch_schema
+        return @schema
+      end
+
+      def default_attributes
+        Hash[schema[:properties].keys.zip]
+      end
+
       protected
+
+      def _fetch_schema(rebuild = false)
+        return @schema unless @schema.nil? || rebuild
+        @schema = connection.run(:get, endpoint+'/schema')
+      end
 
       def _build_connection(rebuild = false)
         return @connection_object unless @connection_object.nil? || rebuild
@@ -121,7 +141,7 @@ module MatconClient
 
     private
 
-    def update_attributes(attrs)
+    def set_attributes(attrs)
       return @attributes unless attrs.present?
       attrs.each do |key, value|
         send("#{key}=", value)
@@ -152,4 +172,5 @@ module MatconClient
     end
 
   end
+
 end
