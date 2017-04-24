@@ -3,7 +3,7 @@ require "spec_helper"
 describe MatconClient::Connection do
 
   before(:each) do
-    @connection = MatconClient::Connection.new(site: 'monkey.news')
+    @connection = MatconClient::Connection.new(site: 'http://monkey.news')
   end
 
   it 'builds a Faraday connection on initialization' do
