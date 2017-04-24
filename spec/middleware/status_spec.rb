@@ -5,6 +5,7 @@ describe MatconClient::Middleware::Status do
   before do
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
       stub.get('/not_authorized') { |env| [401, {}, 'monkey'] }
+      stub.get('/bad_request') { |env| [400, {}, 'monkey'] }
       stub.get('/access_denied') { |env| [403, {}, 'monkey'] }
       stub.get('/not_found') { |env| [404, {}, 'monkey'] }
       stub.get('/conflict') { |env| [409, {}, 'monkey'] }
@@ -21,6 +22,10 @@ describe MatconClient::Middleware::Status do
 
   it 'raises Errors::NotAuthorized when status is 401' do
     expect { @connection.get '/not_authorized' }.to raise_error(MatconClient::Errors::NotAuthorized)
+  end
+
+  it 'raises Errors::BadRequest when status is 400' do
+    expect { @connection.get '/bad_request' }.to raise_error(MatconClient::Errors::BadRequest)
   end
 
   it 'raises Errors::AccessDenied when status is 403' do
@@ -46,6 +51,5 @@ describe MatconClient::Middleware::Status do
   it 'raises Errors::UnexpectedStatus when status not recognised' do
     expect { @connection.get '/unexpected_status' }.to raise_error(MatconClient::Errors::UnexpectedStatus)
   end
-
 
 end

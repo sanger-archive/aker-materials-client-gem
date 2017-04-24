@@ -25,6 +25,7 @@ module MatconClient
           when 422
             raise Errors::UnprocessableEntity, env
           when 400..499
+            raise Errors::BadRequest, env
           when 500..599
             raise Errors::ServerError, env
           else

@@ -25,7 +25,7 @@ describe MatconClient::Connection do
     it 'adds middleware to the Faraday middleware stack'
 
     context 'when the builder is locked' do
-      it 'does\'t add middleware to the Faraday middleware stack'
+      it 'doesn\'t add middleware to the Faraday middleware stack'
     end
 
   end
