@@ -19,8 +19,12 @@ module MatconClient
     class UnprocessableEntity < ClientError
     end
 
+    class BadRequest < ClientError
+    end
+
     class ConnectionError < ApiError
     end
+
 
     class ServerError < ApiError
       def message
