@@ -117,7 +117,7 @@ module MatconClient
 
       def _fetch_schema(rebuild = false)
         return @schema unless @schema.nil? || rebuild
-        @schema = connection.run(:get, endpoint+'/schema')
+        @schema = connection.run(:get, endpoint+'/json_schema')
       end
 
       def _build_connection(rebuild = false)
