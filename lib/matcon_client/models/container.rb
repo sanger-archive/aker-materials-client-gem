@@ -6,7 +6,7 @@ module MatconClient
 
     def serialize
       container_hash = super
-      container_hash.merge!(slots: serialize_slots) if has_attribute?(:slots)
+      container_hash.merge!(slots: serialize_slots) unless attributes[:slots].nil?
       container_hash
     end
 
@@ -37,7 +37,11 @@ module MatconClient
   private
 
     def make_slots(superslots)
-    	superslots.map { |s| MatconClient::Slot.new(s) }
+      if superslots.nil?
+        return nil
+      else
+      	return superslots.map { |s| MatconClient::Slot.new(s) }
+      end
     end
 
     def serialize_slots
