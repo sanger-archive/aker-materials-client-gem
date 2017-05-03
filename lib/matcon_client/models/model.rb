@@ -110,7 +110,7 @@ module MatconClient
       end
 
       def default_attributes
-        Hash[schema[:properties].keys.zip]
+        Hash[schema.body["properties"].keys.zip]
       end
 
       protected
