@@ -1,7 +1,7 @@
 module MatconClient
   class Slot
-   	attr_reader :address, :material_id
-    attr_accessor :material
+   	attr_reader :address
+    attr_accessor :material, :material_id
 
   	def initialize(attrs)
   		@address = attrs.fetch(:address)
@@ -20,8 +20,13 @@ module MatconClient
   	end
 
     def material=(material)
-      @material=material
-      @material_id=material.id
+      @material = material
+      @material_id = material.id
+    end
+
+    def material_id=(material_id)
+      @material_id = material_id
+      @material = nil
     end
 
     def serialize
