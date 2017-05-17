@@ -4,12 +4,13 @@ module MatconClient
     self.endpoint = 'materials'
 
     def parents
-      MatconClient::Material.where(parent_ids: {"$in" => @parent_ids})
+      if @attributes["parents"].all? {|s| s.kind_of? String }
+        MatconClient::Material.where("_id" => {"$in" =>  @attributes["parents"]})
+      else
+        super
+      end
     end
 
-    def parents=(prnts)
-      @parent_ids = prnts.map(&:_id)
-    end
   end
 
 end 

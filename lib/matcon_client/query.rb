@@ -23,6 +23,8 @@ module MatconClient
 
     attr_reader :params, :klass
 
+    alias_method :all, :entries
+
     def initialize(options)
       @klass  = options.fetch(:klass)
       @params = initial_params
