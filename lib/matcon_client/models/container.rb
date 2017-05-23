@@ -34,6 +34,22 @@ module MatconClient
       slots.select { |slot| !slot.empty? }.map(&:material)
     end
 
+    def add_to_slot(address, material)
+      slot = slots.select{|s| s.address == address}.first
+      slot.material_id = material.id
+    end
+
+    def self.add_to_slot(barcode, address, material)
+      container = where(barcode: barcode).first
+      container.add_to_slot(address, material)
+    end
+
+    def self.add_to_slots(layout)
+      layout.each do |address, material|
+        add_to_slot(address, material)
+      end
+    end
+
   private
 
     def make_slots(superslots)
