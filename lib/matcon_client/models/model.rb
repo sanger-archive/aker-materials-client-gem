@@ -55,8 +55,8 @@ module MatconClient
     end
 
     def update_attributes(attrs)
-      set_attributes(attrs)
-      save
+      model = requestor.patch(@attributes[:_id], attrs.to_json)
+      set_attributes(model.attributes)
     end
 
     class << self
