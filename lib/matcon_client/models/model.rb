@@ -110,14 +110,14 @@ module MatconClient
       end
 
       def default_attributes
-        Hash[schema.body["properties"].keys.zip]
+        Hash[schema["properties"].keys.zip]
       end
 
       protected
 
       def _fetch_schema(rebuild = false)
         return @schema unless @schema.nil? || rebuild
-        @schema = connection.run(:get, endpoint+'/json_schema')
+        @schema = connection.run(:get, endpoint+'/json_schema').body
       end
 
       def _build_connection(rebuild = false)
