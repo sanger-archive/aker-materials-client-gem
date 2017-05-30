@@ -248,22 +248,23 @@ RSpec.shared_examples "a model" do
   end
 
   describe '#update_attributes' do
-    it 'to update model with the new attributes' do
+    it 'to patch model with the new attributes' do
       captured = {}
-      body = described_class.default_attributes.merge({ _id: '123', gender: 'female', common_name: 'Mouse'})
+      id = '123'
       expect(described_class.connection).to receive(:run) do |method, url, body_json, other|
                               captured[:method] = method
                               captured[:url] = url
                               captured[:body] = body_json
                         end
                       .and_return(instance_double('Faraday::Response', body: { _id: '123', gender: 'female', common_name: 'Mouse' }))
-      model = described_class.new(_id: '123', gender: 'male')
-      model.update_attributes(gender: 'female', common_name: 'Mouse')
-      expect(model.gender).to eq 'female'
-      expect(model.common_name).to eq 'Mouse'
-      expect(captured[:method]).to eq :put
-      expect(captured[:url]).to eq described_class.endpoint+'/'+body[:_id]
-      expect(JSON.parse(captured[:body])).to eq body.stringify_keys
+      model = described_class.new(_id: id, gender: 'male')
+      changes = { gender: 'female', common_name: 'Mouse' }
+      model.update_attributes(changes)
+      expect(model.gender).to eq('female')
+      expect(model.common_name).to eq('Mouse')
+      expect(captured[:method]).to eq(:patch)
+      expect(captured[:url]).to eq(described_class.endpoint+'/'+id)
+      expect(JSON.parse(captured[:body])).to eq(JSON.parse(changes.to_json))
     end
   end
 
