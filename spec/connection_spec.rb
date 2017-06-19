@@ -1,10 +1,17 @@
 require "spec_helper"
 require "byebug"
 describe MatconClient::Connection do
+  
   let(:new_middleware) { double('fake middleware')}
 
-  def has_middleware?(middleware)
-    @connection.faraday.builder.handlers.include?(middleware)
+  RSpec::Matchers.define :include_middleware do |middleware|
+    match do |connection|
+      has_middleware?(connection, middleware)
+    end
+
+    def has_middleware?(connection, middleware)
+      connection.faraday.builder.handlers.include?(middleware)
+    end
   end
 
 
@@ -29,7 +36,7 @@ describe MatconClient::Connection do
 
     it 'adds middleware to the Faraday middleware stack' do
       @connection.use(new_middleware)
-      expect(has_middleware?(new_middleware)).to eq(true)
+      expect(@connection).to include_middleware(new_middleware)
     end
 
     context 'when the builder is locked' do
@@ -38,7 +45,7 @@ describe MatconClient::Connection do
       end
       it 'does not add middleware to the Faraday middleware stack' do
         @connection.use(new_middleware)
-        expect(has_middleware?(new_middleware)).to eq(false)
+        expect(@connection).not_to include_middleware(new_middleware)
       end
     end
 
@@ -51,9 +58,9 @@ describe MatconClient::Connection do
     end
 
     it 'deletes middleware from the Faraday middleware stack' do
-      expect(has_middleware?(new_middleware)).to eq(true)
+      expect(@connection).to include_middleware(new_middleware)
       @connection.delete(new_middleware)
-      expect(has_middleware?(new_middleware)).to eq(false)
+      expect(@connection).not_to include_middleware(new_middleware)
     end
   end
 end
