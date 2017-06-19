@@ -1,6 +1,12 @@
 require "spec_helper"
-
+require "byebug"
 describe MatconClient::Connection do
+  let(:new_middleware) { double('fake middleware')}
+
+  def has_middleware?(middleware)
+    @connection.faraday.builder.handlers.include?(middleware)
+  end
+
 
   before(:each) do
     @connection = MatconClient::Connection.new(site: 'http://monkey.news')
@@ -19,19 +25,35 @@ describe MatconClient::Connection do
 
   end
 
-  # TODO: I can't figure out how to test what Middleware Faraday currently has in its stack
   describe '#use' do
 
-    it 'adds middleware to the Faraday middleware stack'
+    it 'adds middleware to the Faraday middleware stack' do
+      @connection.use(new_middleware)
+      expect(has_middleware?(new_middleware)).to eq(true)
+    end
 
     context 'when the builder is locked' do
-      it 'doesn\'t add middleware to the Faraday middleware stack'
+      before do
+        allow(@connection.faraday.builder).to receive(:locked?).and_return(true)
+      end
+      it 'does not add middleware to the Faraday middleware stack' do
+        @connection.use(new_middleware)
+        expect(has_middleware?(new_middleware)).to eq(false)
+      end
     end
 
   end
 
   describe '#delete' do
-    it 'deletes middleware from the Faraday middleware stack'
-  end
 
+    before do
+      @connection.use(new_middleware)
+    end
+
+    it 'deletes middleware from the Faraday middleware stack' do
+      expect(has_middleware?(new_middleware)).to eq(true)
+      @connection.delete(new_middleware)
+      expect(has_middleware?(new_middleware)).to eq(false)
+    end
+  end
 end
