@@ -55,8 +55,8 @@ module MatconClient
     end
 
     def update_attributes(attrs)
-      set_attributes(attrs)
-      save
+      model = requestor.patch(@attributes[:_id], attrs.to_json)
+      set_attributes(model.attributes)
     end
 
     class << self
@@ -110,14 +110,14 @@ module MatconClient
       end
 
       def default_attributes
-        Hash[schema.body["properties"].keys.zip]
+        Hash[schema["properties"].keys.zip]
       end
 
       protected
 
       def _fetch_schema(rebuild = false)
         return @schema unless @schema.nil? || rebuild
-        @schema = connection.run(:get, endpoint+'/json_schema')
+        @schema = connection.run(:get, endpoint+'/json_schema').body
       end
 
       def _build_connection(rebuild = false)

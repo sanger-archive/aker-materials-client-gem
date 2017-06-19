@@ -30,15 +30,15 @@ module MatconClient
 	  end
 
     def has_next?
-      _links.has_key?(:next)
+      _links&.has_key?(:next)
     end
 
     def has_prev?
-      _links.has_key?(:prev)
+      _links&.has_key?(:prev)
     end
 
     def is_last?
-      !_links.has_key?(:last)
+      !_links&.has_key?(:last)
     end
 
     def next

@@ -24,6 +24,10 @@ module MatconClient
       request(:delete, fullpath(path), params, header)
     end
 
+    def patch(path, params = {}, headers = {})
+      request(:patch, fullpath(path), params, headers)
+    end
+
   private
 
     def fullpath(path, query=nil)
