@@ -13,6 +13,8 @@ module MatconClient
                     :query_object,
                     :schema
 
+    self.site = ENV['MATERIAL_URL']
+
     self.connection_class     = Connection
     self.connection_options   = { :headers => { "Content-Type" => "application/json", "Accept" => "application/json" } }
 
