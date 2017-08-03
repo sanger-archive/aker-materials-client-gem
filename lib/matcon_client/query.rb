@@ -37,8 +37,20 @@ module MatconClient
     end
 
     # Executes the built query. Will return a ModelClient::ResultSet
-    def result_set
+    def _result_set_with_get
+      if params[:where]
+        params[:where] = format_hash(params[:where])
+      end
       klass.requestor.get(nil, { query: to_s })
+    end
+
+    # Executes a query using a POST
+    def _result_set_with_post
+      klass.requestor.post('search', params.to_json)
+    end
+
+    def result_set
+      _result_set_with_post
     end
 
     # Resets all params to nil
@@ -93,7 +105,7 @@ module MatconClient
     # Sets the where parameter
     # Returns self
     def where(where_params)
-      @params[:where] = format_hash(where_params)
+      @params[:where] = where_params
       self
     end
 
