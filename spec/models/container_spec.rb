@@ -50,12 +50,12 @@ describe MatconClient::Container do
       }
 
       it 'returns all the materials from the slots' do
-        query = { '_id': { '$in': ['234', '345'] } }.to_json
+        query = { '_id': { '$in': ['234', '345'] } }
 
-        expect(MatconClient::Material.requestor).to receive(:get)
-          .with(nil, { query: 'where=' + query })
-          .and_return(result_set)
-
+        temp = double('temp')
+        allow(temp).to receive(:result_set).and_return(result_set)
+        expect(MatconClient::Material).to receive(:where).with(query).and_return(temp)
+        
         expect(container.materials).to all(be_instance_of(MatconClient::Material))
         expect(container.materials.length).to eq(3)
       end
