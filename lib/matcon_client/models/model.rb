@@ -10,7 +10,6 @@ module MatconClient
                     :endpoint,
                     :response_handler,
                     :requestor,
-                    :query_object,
                     :schema
 
     self.site = ENV['MATERIAL_URL']
@@ -103,7 +102,7 @@ module MatconClient
       end
 
       def query_object
-        @query_object ||= MatconClient::Query.new(klass: self)
+        MatconClient::Query.new(klass: self)
       end
 
       def schema
