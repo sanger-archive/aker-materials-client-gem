@@ -134,7 +134,7 @@ module MatconClient
         key, value = obj
 
         if value.present?
-          if key == :where
+          if value.is_a? Hash
             value = format_hash(value)
           end
           memo.push("#{key}=#{value}")
@@ -159,15 +159,17 @@ module MatconClient
 
     # Takes in a String and calls convert_to_truthy_hash
     # or takes in a Hash and calls convert_values_to_int
-    # Returns a formatted hash
+    # Returns an actual hash, not a string
     def convert_to_bool_valued_hash(params)
-      params = if (params.is_a?(String)) then
-                 convert_to_truthy_hash(params)
-               else
-                 convert_values_to_int(params)
-               end
-
-      format_hash(params)
+      if (params.is_a?(String)) then
+        convert_string_to_truthy_hash(params)
+      elsif (params.is_a?(Symbol)) then
+        {params.to_s => 1}
+      elsif (params.is_a?(Array)) then
+        convert_array_to_truthy_hash(params)
+      else
+        convert_values_to_int(params)
+      end
     end
 
     # Takes a String and returns a Hash with 1 as the values
@@ -176,8 +178,14 @@ module MatconClient
     #
     # convert_to_truthy_hash('monkey,giraffe,banana')
     # #  => { monkey: 1, giraffe: 1, banana: 1}
-    def convert_to_truthy_hash(str)
-      str.gsub(' ', '').split(',').reduce({}) do |memo, value|
+    def convert_string_to_truthy_hash(str)
+      convert_array_to_truthy_hash(str.gsub(' ', '').split(','))
+    end
+
+    # Takes an array and returns a hash with 1 as each value.
+    # Example ([:alpha, :beta]) => { alpha: 1, beta: 2 }
+    def convert_array_to_truthy_hash(items)
+      items.reduce({}) do |memo, value|
         memo[value] = 1
         memo
       end
