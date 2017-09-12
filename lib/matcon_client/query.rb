@@ -27,7 +27,7 @@ module MatconClient
 
     def initialize(options)
       @klass  = options.fetch(:klass)
-      @params = initial_params
+      @params = options[:params] || initial_params
     end
 
     def each(&block)
@@ -43,7 +43,7 @@ module MatconClient
 
     # Executes a query using a POST
     def result_set_with_post
-      klass.requestor.post('search', params.reject{|k,v| v.nil?}.to_json)
+      klass.requestor.post('search', params.reject{|k,v| v.nil?}.to_json, {}, self)
     end
 
     def result_set
