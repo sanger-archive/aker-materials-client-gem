@@ -9,6 +9,7 @@ module MatconClient
     def initialize(options)
       @response = options.fetch(:response)
       @model = options.fetch(:model)
+      @post_query = options[:post_query]
     end
 
     def each(&block)
@@ -53,9 +54,21 @@ module MatconClient
       request_link(_links[:last])
     end
 
-   private
+  private
+
+    # Follow a page index from a post-search.
+    # I.e. rerun the post query that generated these results, but
+    #  with the page set to whatever page is indicated.
+    # If there is no page indicated, return nil.
+    def request_post(link, post_query)
+      return nil unless link && link[:page]
+      params = post_query.params.merge(page: link[:page])
+      Query.new(klass: post_query.klass, params: params).result_set_with_post
+    end
 
     def request_link(link)
+      return request_post(link, @post_query) if @post_query
+      return nil unless link && link[:href]
       uri = URI(link[:href])
       model.requestor.get(nil, { query: uri.query })
     end

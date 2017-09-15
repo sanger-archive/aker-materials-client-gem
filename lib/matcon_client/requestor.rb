@@ -12,16 +12,16 @@ module MatconClient
       request(:get, fullpath(path, query), {}, headers)
     end
 
-    def post(path=nil, params = {}, headers = {})
-      request(:post, fullpath(path), params, headers)
+    def post(path=nil, params = {}, headers = {}, post_query = nil)
+      request(:post, fullpath(path), params, headers, post_query)
     end
 
     def put(path, params = {}, headers = {})
       request(:put, fullpath(path), params, headers)
     end
 
-    def delete(path, params = {}, header = {})
-      request(:delete, fullpath(path), params, header)
+    def delete(path, params = {}, headers = {})
+      request(:delete, fullpath(path), params, headers)
     end
 
     def patch(path, params = {}, headers = {})
@@ -37,8 +37,8 @@ module MatconClient
       f
     end
 
-    def request(action, path, params, headers)
-      klass.response_handler.build(klass.connection.run(action, path, params, headers))
+    def request(action, path, params, headers, post_query=nil)
+      klass.response_handler.build(klass.connection.run(action, path, params, headers), post_query)
     end
 
   end
