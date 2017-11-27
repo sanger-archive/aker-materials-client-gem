@@ -32,7 +32,7 @@ module MatconClient
 
     def fullpath(path, query=nil)
       f = klass.endpoint
-      f += '/'+path unless path.nil?
+      f += path unless path.nil?
       f = "#{f}?#{query}" unless query.nil?
       f
     end
