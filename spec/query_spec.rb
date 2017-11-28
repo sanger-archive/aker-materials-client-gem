@@ -203,7 +203,7 @@ describe MatconClient::Query do
 
   describe '#result_set_with_post' do
     it 'should create a result set by calling the klass requestor with its query string' do
-      expect(@requestor).to receive(:post).with('search', { page: 2, max_results: 30}.to_json )
+      expect(@requestor).to receive(:post).with('search', { page: 2, max_results: 30}.to_json, {}, @query )
 
       @query.page(2).limit(30).result_set_with_post
     end
