@@ -11,13 +11,15 @@ module MatconClient
       adapter_options = Array(options.fetch(:adapter, Faraday.default_adapter))
 
       @faraday = Faraday.new(site, connection_options) do |builder|
-        builder.adapter(*adapter_options)
 
         builder.use MatconClient::Middleware::Status
 
         # Faraday Middleware
         # https://github.com/lostisland/faraday_middleware
         builder.use ::FaradayMiddleware::ParseJson, :content_type => /\bjson$/
+
+        # adapter must be set last: https://github.com/lostisland/faraday#advanced-middleware-usage
+        builder.adapter(*adapter_options)
       end
 
       yield(self) if block_given?
