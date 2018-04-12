@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'matcon_client/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "matcon_client"
+  spec.name          = "aker_materials_client"
   spec.version       = MatconClient::VERSION
   spec.authors       = ["Chris Smith"]
   spec.email         = ["cs24@sanger.ac.uk"]
