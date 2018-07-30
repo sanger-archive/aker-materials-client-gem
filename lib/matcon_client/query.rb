@@ -83,8 +83,8 @@ module MatconClient
       if order.is_a?(Hash)
         raise ArgumentError, "You can not order by more than one field" if order.length > 1
         params[:sort_by], params[:sort_order] = order.first
-        raise ArgumentError, "Order must be :asc, :desc, 1, or -1" unless [:asc, :desc, 1, -1].include? params[:sort_order]
-        params[:sort_order] = params[:sort_order] == :asc ? 1 : -1
+        raise ArgumentError, "Order must be :asc, :desc, 1, or -1" unless ["asc", "desc", "1", "-1"].include? params[:sort_order].to_s
+        params[:sort_order] = ["1", "asc"].include?(params[:sort_order].to_s) ? 1 : -1
       elsif order.is_a?(String)
         if order.first == '-'
           params[:sort_order] = -1

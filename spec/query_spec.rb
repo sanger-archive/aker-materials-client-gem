@@ -55,9 +55,19 @@ describe MatconClient::Query do
         expect { @query.order(city: :monkey) }.to raise_error(ArgumentError)
       end
 
+      it 'sets the sort_by and sort_order values using 1' do
+        @query.order(city: 1)
+        expect(@query.to_s).to eql("sort_by=city&sort_order=1")
+      end
+
       it 'sets the sort_by and sort_order values using -1' do
         @query.order(city: -1)
         expect(@query.to_s).to eql("sort_by=city&sort_order=-1")
+      end
+
+      it 'sets the sort_by and sort_order values using :asc' do
+        @query.order(city: :asc)
+        expect(@query.to_s).to eql("sort_by=city&sort_order=1")
       end
 
       it 'sets the sort_by and sort_order values using :desc' do
