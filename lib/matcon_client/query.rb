@@ -73,28 +73,27 @@ module MatconClient
     end
 
     # arg order could be a Hash or a String
-    # If Hash then key must be the field, and value must be :asc or :desc
-    # If String then fields must be comma separated. Fields you wish to sort descending
+    # If Hash then key must be the field, and value must be :asc, :desc, 1 or -1
+    # If String then fields you wish to sort descending
     # should be preceeded with a minus (-)
     #
     # Sets the sort parameter
     # Returns self
     def order(order)
-      params[:sort] = if order.is_a?(Hash) then
-                        order.reduce([]) do |memo, obj|
-                          key, value = obj
-
-                          if (value.to_s != "asc" && value.to_s != "desc") then
-                            raise ArgumentError, "Order must be either :asc or :desc"
-                          end
-
-                          key = "-#{key}" if value.to_s == "desc"
-                          memo.push(key)
-                        end.join(",")
-                      elsif order.is_a?(String) then
-                        order
-                      end
-
+      if order.is_a?(Hash)
+        raise ArgumentError, "You can not order by more than one field" if order.length > 1
+        params[:sort_by], params[:sort_order] = order.first
+        raise ArgumentError, "Order must be :asc, :desc, 1, or -1" unless [:asc, :desc, 1, -1].include? params[:sort_order]
+        params[:sort_order] = params[:sort_order] == :asc ? 1 : -1
+      elsif order.is_a?(String)
+        if order.first == '-'
+          params[:sort_order] = -1
+          params[:sort_by] = order[1..-1]
+        else
+          params[:sort_order] = 1
+          params[:sort_by] = order
+        end
+      end
       self
     end
 
@@ -150,7 +149,8 @@ module MatconClient
       {
         page: nil,
         max_results: nil,
-        sort: nil,
+        sort_by: nil,
+        sort_order: nil,
         where: nil,
         projection: nil,
         embeddable: nil

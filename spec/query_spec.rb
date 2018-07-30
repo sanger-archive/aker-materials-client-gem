@@ -47,26 +47,42 @@ describe MatconClient::Query do
 
     context 'when a Hash is passed in' do
 
-      it 'raises an error if value is not "asc" or "desc"' do
+      it 'raises an error if it has length > 1' do
+        expect { @query.order(city: 1, street: -1) }.to raise_error(ArgumentError)
+      end
+
+      it 'raises an error if value is not "asc", "desc", 1, or -1' do
         expect { @query.order(city: :monkey) }.to raise_error(ArgumentError)
       end
 
-      it 'sets the sort value' do
-        @query.order(city: :asc, lastname: :desc)
-        expect(@query.to_s).to eql("sort=city,-lastname")
+      it 'sets the sort_by and sort_order values using -1' do
+        @query.order(city: -1)
+        expect(@query.to_s).to eql("sort_by=city&sort_order=-1")
+      end
+
+      it 'sets the sort_by and sort_order values using :desc' do
+        @query.order(city: :desc)
+        expect(@query.to_s).to eql("sort_by=city&sort_order=-1")
       end
 
       it 'returns the MatconClient::Query object' do
-        expect(@query.order(city: :asc, lastname: :desc)).to eql(@query)
+        expect(@query.order(city: :asc)).to eql(@query)
       end
 
     end
 
     context 'when I pass a String' do
 
-      it 'sets the sort value' do
-        @query.order('city,-lastname')
-        expect(@query.to_s).to eql('sort=city,-lastname')
+      it 'sets the sort_by and sort_order values' do
+        @query.order('city')
+        expect(@query.to_s).to eql('sort_by=city&sort_order=1')
+      end
+
+      context 'descending' do
+        it 'sets the sort_by and sort_order values' do
+          @query.order('-city')
+          expect(@query.to_s).to eql('sort_by=city&sort_order=-1')
+        end
       end
     end
 
@@ -158,12 +174,12 @@ describe MatconClient::Query do
     it "returns a joined query string when chaining parameters" do
       @query.page(2)
             .limit(30)
-            .order(city: :asc, name: :desc)
+            .order(city: :asc)
             .where(lastname: "Doe")
             .projection(firstname: true)
             .embed(author: 1)
 
-      expect(@query.to_s).to eql("page=2&max_results=30&sort=city,-name&where={\"lastname\":\"Doe\"}&projection={\"firstname\":1}&embeddable={\"author\":1}")
+      expect(@query.to_s).to eql("page=2&max_results=30&sort_by=city&sort_order=1&where={\"lastname\":\"Doe\"}&projection={\"firstname\":1}&embeddable={\"author\":1}")
     end
 
   end
@@ -172,7 +188,7 @@ describe MatconClient::Query do
     it 'sets params back to nil' do
       @query.page(2)
             .limit(30)
-            .order(city: :asc, name: :desc)
+            .order(city: :desc)
             .where(lastname: "Doe")
             .projection(firstname: true)
             .embed(author: 1)
